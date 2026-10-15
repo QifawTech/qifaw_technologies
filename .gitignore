@@ -1,0 +1,51 @@
+# ═══ PYTHON ═══
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+env/
+ENV/
+*.egg-info/
+
+# ═══ ENV FILES (CRITICAL — NEVER PUSH) ═══
+.env
+.env.local
+.env.production
+backend/.env
+frontend/.env
+
+# ═══ NODE ═══
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+frontend/dist/
+frontend/build/
+
+# ═══ UPLOADS (user data — don't commit) ═══
+backend/uploads/media/*
+backend/uploads/resumes/*
+!backend/uploads/media/.gitkeep
+!backend/uploads/resumes/.gitkeep
+
+# ═══ IDE ═══
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ═══ OS ═══
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ═══ LOGS ═══
+*.log
+logs/
+
+# ═══ MISC ═══
+*.bak
+*.backup
