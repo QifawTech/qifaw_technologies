@@ -49,3 +49,11 @@ logs/
 # ═══ MISC ═══
 *.bak
 *.backup
+
+
+# ═══ ARCHIVES (never commit) ═══
+*.zip
+*.rar
+*.7z
+*.tar.gz
+*.tgz
