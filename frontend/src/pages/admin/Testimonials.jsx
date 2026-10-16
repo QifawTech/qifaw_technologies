@@ -156,7 +156,7 @@ export default function AdminTestimonials() {
     s === "on_hold" ? "badge-on_hold" :
     "badge-draft";
 
-  const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api/v1";
+  const API_BASE = import.meta.env.VITE_API_BASE_URL || "/api/v1";
   const previewImage = (path) =>
     path ? `${API_BASE}/public/media/${path.replace(/^media\//, "")}` : null;
 

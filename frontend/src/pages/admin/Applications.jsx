@@ -91,7 +91,7 @@ export default function AdminApplications() {
 
   // ✅ SIMPLE: Direct browser navigation — browser handles everything
   const downloadResume = (id) => {
-    const baseURL = api.defaults.baseURL; // http://localhost:5000/api/v1
+    const baseURL = api.defaults.baseURL; // /api/v1
     const url = `${baseURL}/admin/applications/${id}/resume`;
     window.open(url, "_blank");
   };
