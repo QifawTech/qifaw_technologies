@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { publicApi } from "../../api/client.js";
-import Loader from "../../components/Loader.jsx";
 import ProductCard from "../../components/ProductCard.jsx";
 import ServiceCard from "../../components/ServiceCard.jsx";
 import JobCard from "../../components/JobCard.jsx";
@@ -118,7 +117,8 @@ export default function Home() {
     }
   };
 
-  if (state.loading) return <Loader />;
+  // ❌ REMOVED: if (state.loading) return <Loader />; 
+  // Ithu thaan full page-ah block pannitu irundhathu. Ippo adhu illa.
 
   const hero = state.hero || {
     headline: "Build the future with modern IT solutions",
@@ -142,7 +142,7 @@ export default function Home() {
   return (
     <>
       {/* ═══════════════════════════════════════════════════
-          HOME / HERO
+          HOME / HERO (With Skeleton Loading)
       ═══════════════════════════════════════════════════ */}
       <section id="home" className="hero-section">
         <div className="hero-bg-mesh" aria-hidden="true">
@@ -170,13 +170,23 @@ export default function Home() {
 
               <Reveal delay={100}>
                 <h1 className="hero-headline">
-                  {headlineMain}{" "}
-                  <span className="hero-gradient-text">{headlineAccent}</span>
+                  {state.loading ? (
+                    <span className="skeleton-text" style={{ width: '80%', display: 'block', height: '50px', marginBottom: '10px' }}></span>
+                  ) : (
+                    <>
+                      {headlineMain}{" "}
+                      <span className="hero-gradient-text">{headlineAccent}</span>
+                    </>
+                  )}
                 </h1>
               </Reveal>
 
               <Reveal delay={200}>
-                <p className="hero-subheadline">{hero.subheadline}</p>
+                {state.loading ? (
+                  <div className="skeleton-text" style={{ width: '100%', height: '20px', marginBottom: '10px' }}></div>
+                ) : (
+                  <p className="hero-subheadline">{hero.subheadline}</p>
+                )}
               </Reveal>
 
               <Reveal delay={300}>
@@ -344,7 +354,7 @@ export default function Home() {
       </section>
 
       {/* ═══════════════════════════════════════════════════
-          PRODUCTS
+          PRODUCTS (With Skeleton Loading)
       ═══════════════════════════════════════════════════ */}
       <section id="products" className="section products-section">
         <div className="container">
@@ -357,7 +367,17 @@ export default function Home() {
             />
           </Reveal>
 
-          {state.products.length === 0 ? (
+          {state.loading ? (
+            <div className="products-grid">
+              {[1, 2, 3].map((n) => (
+                <div key={n} className="card-clean p-4" style={{ height: '350px' }}>
+                  <div className="skeleton-box" style={{ height: '180px', marginBottom: '1rem' }}></div>
+                  <div className="skeleton-text" style={{ width: '70%', height: '20px', marginBottom: '10px' }}></div>
+                  <div className="skeleton-text" style={{ width: '90%', height: '15px' }}></div>
+                </div>
+              ))}
+            </div>
+          ) : state.products.length === 0 ? (
             <p className="text-center" style={{ color: "var(--muted)" }}>
               Products coming soon.
             </p>
@@ -379,7 +399,7 @@ export default function Home() {
       </section>
 
       {/* ═══════════════════════════════════════════════════
-          SERVICES
+          SERVICES (With Skeleton Loading)
       ═══════════════════════════════════════════════════ */}
       <section id="services" className="section" style={{ background: "var(--bg)" }}>
         <div className="container">
@@ -392,7 +412,28 @@ export default function Home() {
             />
           </Reveal>
 
-          {state.services.length === 0 ? (
+          {state.loading ? (
+             <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+                gap: "1.5rem",
+                alignItems: "stretch",
+                width: "100%",
+                marginTop: "3rem",
+              }}
+              className="services-grid-inline"
+            >
+              {[1, 2, 3].map((n) => (
+                <div key={n} className="card-clean p-4" style={{ height: '250px' }}>
+                  <div className="skeleton-box" style={{ height: '60px', width: '60px', borderRadius: '50%', marginBottom: '1rem' }}></div>
+                  <div className="skeleton-text" style={{ width: '60%', height: '20px', marginBottom: '10px' }}></div>
+                  <div className="skeleton-text" style={{ width: '100%', height: '15px', marginBottom: '8px' }}></div>
+                  <div className="skeleton-text" style={{ width: '80%', height: '15px' }}></div>
+                </div>
+              ))}
+            </div>
+          ) : state.services.length === 0 ? (
             <p className="text-center" style={{ color: "var(--muted)" }}>
               Services coming soon.
             </p>
@@ -425,9 +466,9 @@ export default function Home() {
       </section>
 
       {/* ═══════════════════════════════════════════════════
-          TESTIMONIALS
+          TESTIMONIALS (With Skeleton Loading)
       ═══════════════════════════════════════════════════ */}
-      {state.testimonials.length > 0 && (
+      {(state.loading || state.testimonials.length > 0) && (
         <section className="section" style={{ background: "var(--bg-alt)" }}>
           <div className="container">
             <Reveal>
@@ -439,27 +480,55 @@ export default function Home() {
               />
             </Reveal>
 
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-                gap: "1.5rem",
-                alignItems: "stretch",
-                width: "100%",
-                marginTop: "3rem",
-              }}
-              className="testimonials-grid-inline"
-            >
-              {state.testimonials.slice(0, 3).map((t, i) => (
-                <TestimonialCard key={t.id} testimonial={t} index={i} />
-              ))}
-            </div>
+            {state.loading ? (
+               <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+                  gap: "1.5rem",
+                  alignItems: "stretch",
+                  width: "100%",
+                  marginTop: "3rem",
+                }}
+                className="testimonials-grid-inline"
+              >
+                {[1, 2, 3].map((n) => (
+                  <div key={n} className="card-clean p-4" style={{ height: '200px' }}>
+                    <div className="skeleton-text" style={{ width: '100%', height: '15px', marginBottom: '10px' }}></div>
+                    <div className="skeleton-text" style={{ width: '90%', height: '15px', marginBottom: '20px' }}></div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <div className="skeleton-box" style={{ height: '40px', width: '40px', borderRadius: '50%' }}></div>
+                      <div style={{ flex: 1 }}>
+                        <div className="skeleton-text" style={{ width: '50%', height: '15px', marginBottom: '5px' }}></div>
+                        <div className="skeleton-text" style={{ width: '30%', height: '12px' }}></div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+                  gap: "1.5rem",
+                  alignItems: "stretch",
+                  width: "100%",
+                  marginTop: "3rem",
+                }}
+                className="testimonials-grid-inline"
+              >
+                {state.testimonials.slice(0, 3).map((t, i) => (
+                  <TestimonialCard key={t.id} testimonial={t} index={i} />
+                ))}
+              </div>
+            )}
           </div>
         </section>
       )}
 
       {/* ═══════════════════════════════════════════════════
-          CAREERS
+          CAREERS (With Skeleton Loading)
       ═══════════════════════════════════════════════════ */}
       <section id="careers" className="section" style={{ background: "var(--bg)" }}>
         <div className="container">
@@ -472,7 +541,7 @@ export default function Home() {
             />
           </Reveal>
 
-          {state.jobs.length > 0 && (
+          {!state.loading && state.jobs.length > 0 && (
             <Reveal delay={100}>
               <div className="careers-tabs">
                 {[
@@ -514,7 +583,29 @@ export default function Home() {
             </Reveal>
           )}
 
-          {state.jobs.length === 0 ? (
+          {state.loading ? (
+             <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+                  gap: "1.5rem",
+                  alignItems: "stretch",
+                  width: "100%",
+                  marginTop: "2.5rem",
+                }}
+                className="careers-grid-inline"
+              >
+                {[1, 2, 3].map((n) => (
+                  <div key={n} className="card-clean p-4" style={{ height: '220px' }}>
+                    <div className="skeleton-text" style={{ width: '60%', height: '20px', marginBottom: '10px' }}></div>
+                    <div className="skeleton-text" style={{ width: '40%', height: '15px', marginBottom: '20px' }}></div>
+                    <div className="skeleton-text" style={{ width: '100%', height: '15px', marginBottom: '10px' }}></div>
+                    <div className="skeleton-text" style={{ width: '90%', height: '15px', marginBottom: '20px' }}></div>
+                    <div className="skeleton-box" style={{ height: '35px', width: '120px' }}></div>
+                  </div>
+                ))}
+              </div>
+          ) : state.jobs.length === 0 ? (
             <p className="text-center" style={{ color: "var(--muted)" }}>
               No openings right now.
             </p>
@@ -556,7 +647,7 @@ export default function Home() {
       </section>
 
       {/* ═══════════════════════════════════════════════════
-          CONTACT
+          CONTACT (Ithu already fast-ah load aagum, so loading state thevai illa)
       ═══════════════════════════════════════════════════ */}
       <section
         id="contact"
