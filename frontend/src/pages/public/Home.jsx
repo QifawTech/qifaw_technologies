@@ -201,7 +201,7 @@ export default function Home() {
               <Reveal delay={400}>
                 <div className="hero-stats">
                   {[
-                    { num: "50+", label: "Projects Delivered", icon: "bi-rocket-takeoff" },
+                    { num: "10+", label: "Projects Delivered", icon: "bi-rocket-takeoff" },
                     { num: "30+", label: "Happy Clients", icon: "bi-emoji-smile" },
                     { num: "99%", label: "Uptime SLA", icon: "bi-shield-check" },
                   ].map((s, i) => (
