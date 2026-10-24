@@ -227,10 +227,11 @@ def create_enquiry():
     return ok(data={"id": eid}, message="Message sent successfully", status=201)
 
 
+# ⚡ MUKKIYAM: Ithula thaan rating-ah add pannirukken
 @public_bp.get("/testimonials")
 def list_testimonials():
     rows = query_all(
-        """SELECT id, client_name, client_role, company, message, avatar_path
+        """SELECT id, client_name, client_role, company, message, avatar_path, rating
            FROM testimonials WHERE status='published'
            ORDER BY created_at DESC"""
     )

@@ -3295,3 +3295,22 @@ html[data-theme="dark"] .highlight-brand { color: #60A5FA !important; } /* Blue 
   .footer-contact-icon { width: 28px; height: 28px; }
   .footer-contact-icon svg { width: 13px; height: 13px; }
 }
+/* Skeleton Loading Animation */
+.skeleton-text, .skeleton-box {
+  background: var(--border);
+  border-radius: 6px;
+  position: relative;
+  overflow: hidden;
+  animation: pulseSkeleton 1.5s infinite ease-in-out;
+}
+
+[data-theme="dark"] .skeleton-text,
+[data-theme="dark"] .skeleton-box {
+  background: rgba(255,255,255,0.1);
+}
+
+@keyframes pulseSkeleton {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}

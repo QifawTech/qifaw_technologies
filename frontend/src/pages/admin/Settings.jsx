@@ -223,11 +223,16 @@ export default function AdminSettings() {
         <div className="col-lg-4">
           <div className="card-clean p-4">
             <h5 className="mb-3">Company Logo</h5>
-            <ImageUpload
-              label=""
-              value={form.logo_path}
-              onChange={(path) => update("logo_path", path)}
-            />
+            
+            {/* ⚡ FIX: Wrapped ImageUpload in a flex container for mobile alignment */}
+            <div style={{ width: "100%", overflow: "hidden" }}>
+              <ImageUpload
+                label=""
+                value={form.logo_path}
+                onChange={(path) => update("logo_path", path)}
+              />
+            </div>
+            
             <div
               className="small mt-3"
               style={{ color: "var(--muted)", fontSize: ".78rem" }}

@@ -1,13 +1,12 @@
 import os
 from datetime import timedelta
-from flask import Flask, jsonify
+from flask import Flask, jsonify, send_from_directory
 from flask_cors import CORS
 
 from config import Config
 from db import init_pool
 from extensions import limiter
 
-# Register blueprints after extension is defined
 from routes.public import public_bp
 from routes.auth import auth_bp
 from routes.admin import admin_bp
@@ -25,19 +24,29 @@ def create_app():
         resources={r"/api/*": {"origins": Config.FRONTEND_ORIGINS}},
         supports_credentials=True,
         allow_headers=["Content-Type", "X-CSRF-Token"],
-        expose_headers=["Content-Disposition"],   # ← ADDED: allow frontend to read filename
+        expose_headers=["Content-Disposition"],
         methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     )
 
     limiter.init_app(app)
     init_pool()
 
+    # Upload folders create pannum
     os.makedirs(os.path.join(Config.UPLOAD_FOLDER, "media"), exist_ok=True)
     os.makedirs(os.path.join(Config.UPLOAD_FOLDER, "resumes"), exist_ok=True)
 
     app.register_blueprint(public_bp, url_prefix="/api/v1/public")
     app.register_blueprint(auth_bp, url_prefix="/api/v1/admin")
     app.register_blueprint(admin_bp, url_prefix="/api/v1/admin")
+
+    # ⚡ MUKKIYAM: Media & Resumes files serve panna routes
+    @app.route('/media/<path:filename>')
+    def serve_media(filename):
+        return send_from_directory(os.path.join(Config.UPLOAD_FOLDER, 'media'), filename)
+
+    @app.route('/resumes/<path:filename>')
+    def serve_resumes(filename):
+        return send_from_directory(os.path.join(Config.UPLOAD_FOLDER, 'resumes'), filename)
 
     @app.get("/api/v1/health")
     def health():

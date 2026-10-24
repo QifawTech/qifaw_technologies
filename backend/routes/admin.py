@@ -785,11 +785,6 @@ def admin_download_resume(aid):
     abs_path = os.path.join(backend_dir, Config.UPLOAD_FOLDER, row["resume_path"])
     abs_path = os.path.abspath(abs_path)
 
-    print(f"[RESUME] id={aid}")
-    print(f"[RESUME] DB path: {row['resume_path']}")
-    print(f"[RESUME] Abs path: {abs_path}")
-    print(f"[RESUME] Exists: {os.path.exists(abs_path)}")
-
     if not os.path.exists(abs_path):
         return err(f"File missing on server: {row['resume_path']}", 404)
 
@@ -941,7 +936,7 @@ def admin_list_testimonials():
 
     rows = query_all(
         f"""SELECT id, client_name, client_role, company, message,
-                   avatar_path, status, created_at, updated_at
+                   avatar_path, rating, status, created_at, updated_at
             FROM testimonials WHERE {where_sql}
             ORDER BY created_at DESC LIMIT %s OFFSET %s""",
         tuple(params) + (per_page, offset),
@@ -978,17 +973,20 @@ def admin_create_testimonial():
     status = data.get("status") or "draft"
     if status not in ("draft", "published", "on_hold"):
         return err("Invalid status", 400)
+    
+    rating = int(data.get("rating") or 5) # ⚡ NEW: Get Rating
 
     tid, _ = execute(
         """INSERT INTO testimonials
-           (client_name, client_role, company, message, avatar_path, status)
-           VALUES (%s, %s, %s, %s, %s, %s)""",
+           (client_name, client_role, company, message, avatar_path, rating, status)
+           VALUES (%s, %s, %s, %s, %s, %s, %s)""",
         (
             client_name,
             (data.get("client_role") or "").strip() or None,
             (data.get("company") or "").strip() or None,
             message,
             (data.get("avatar_path") or "").strip() or None,
+            rating, # ⚡ NEW
             status,
         ),
     )
@@ -1017,10 +1015,12 @@ def admin_update_testimonial(tid):
     if status not in ("draft", "published", "on_hold"):
         return err("Invalid status", 400)
 
+    rating = int(data.get("rating") or 5) # ⚡ NEW
+
     execute(
         """UPDATE testimonials SET
              client_name=%s, client_role=%s, company=%s,
-             message=%s, avatar_path=%s, status=%s
+             message=%s, avatar_path=%s, rating=%s, status=%s
            WHERE id=%s""",
         (
             client_name,
@@ -1028,6 +1028,7 @@ def admin_update_testimonial(tid):
             (data.get("company") or "").strip() or None,
             message,
             (data.get("avatar_path") or "").strip() or None,
+            rating, # ⚡ NEW
             status,
             tid,
         ),
@@ -1071,7 +1072,6 @@ def admin_delete_testimonial(tid):
 @admin_bp.get("/page-content")
 @login_required
 def admin_list_page_contents():
-    """Return all page content sections grouped by page_key."""
     rows = query_all(
         """SELECT id, page_key, section_key, content, updated_at
            FROM page_contents
@@ -1103,11 +1103,9 @@ def admin_update_page_content(page_key, section_key):
     if content is None:
         return err("content is required", 400)
 
-    # Force to dict if it's an object
     if isinstance(content, dict):
         content_json = json.dumps(content)
     elif isinstance(content, str):
-        # Try parse
         try:
             json.loads(content)
             content_json = content
@@ -1151,7 +1149,6 @@ def admin_update_page_content(page_key, section_key):
 def admin_get_settings():
     row = query_one("SELECT * FROM site_settings WHERE id = 1")
     if not row:
-        # Create default row if missing
         execute(
             """INSERT INTO site_settings (id, company_name)
                VALUES (1, 'Your Company')
@@ -1181,7 +1178,6 @@ def admin_update_settings():
     instagram_url = (data.get("instagram_url") or "").strip() or None
     github_url = (data.get("github_url") or "").strip() or None
 
-    # Upsert
     execute(
         """INSERT INTO site_settings
            (id, company_name, logo_path, email, phone, address,

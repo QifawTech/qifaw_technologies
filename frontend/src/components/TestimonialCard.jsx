@@ -1,9 +1,23 @@
 import { useState } from "react";
 
-export default function TestimonialCard({ testimonial, index = 0 }) {
+// Image URL Helper
+const getImageUrl = (imagePath) => {
+  if (!imagePath) return null;
+  if (imagePath.startsWith("http")) return imagePath;
+  
+  // Backend-oda direct media URL
+  const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  return `${baseUrl}/${imagePath.replace(/^\//, "")}`;
+};
+
+export default function TestimonialCard({ testimonial }) {
   const [hovered, setHovered] = useState(false);
   const t = testimonial;
+  
+  // ⚡ FIX: API keys-ku thakka maari client_name & avatar_path use pandrom
   const initial = (t.client_name || "?").charAt(0).toUpperCase();
+  const avatarUrl = getImageUrl(t.avatar_path); 
+  const rating = t.rating || 5;
 
   return (
     <article
@@ -44,7 +58,7 @@ export default function TestimonialCard({ testimonial, index = 0 }) {
         ”
       </div>
 
-      {/* Stars */}
+      {/* Stars - Dynamic Rating */}
       <div
         style={{
           display: "flex",
@@ -54,11 +68,11 @@ export default function TestimonialCard({ testimonial, index = 0 }) {
           zIndex: 1,
         }}
       >
-        {[0, 1, 2, 3, 4].map((i) => (
+        {[...Array(5)].map((_, i) => (
           <i
             key={i}
-            className="bi bi-star-fill"
-            style={{ fontSize: ".85rem", color: "#F59E0B" }}
+            className={`bi ${i < rating ? "bi-star-fill" : "bi-star"}`}
+            style={{ fontSize: ".85rem", color: i < rating ? "#F59E0B" : "var(--border)" }}
           />
         ))}
       </div>
@@ -91,26 +105,45 @@ export default function TestimonialCard({ testimonial, index = 0 }) {
           zIndex: 1,
         }}
       >
-        <div
-          style={{
-            width: 48,
-            height: 48,
-            borderRadius: "50%",
-            background: "linear-gradient(135deg, #2563EB, #3B82F6)",
-            color: "#FFFFFF",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontWeight: 800,
-            fontSize: "1.1rem",
-            flexShrink: 0,
-            boxShadow: "0 6px 18px rgba(37,99,235,.3)",
-            transition: "transform .4s cubic-bezier(.34,1.56,.64,1)",
-            transform: hovered ? "scale(1.08)" : "scale(1)",
-          }}
-        >
-          {initial}
-        </div>
+        {/* Image or Initial */}
+        {avatarUrl ? (
+          <img
+            src={avatarUrl}
+            alt={t.client_name}
+            style={{
+              width: 48,
+              height: 48,
+              borderRadius: "50%",
+              objectFit: "cover",
+              flexShrink: 0,
+              border: "2px solid var(--bg-alt)",
+              transform: hovered ? "scale(1.08)" : "scale(1)",
+              transition: "transform .4s cubic-bezier(.34,1.56,.64,1)",
+            }}
+          />
+        ) : (
+          <div
+            style={{
+              width: 48,
+              height: 48,
+              borderRadius: "50%",
+              background: "linear-gradient(135deg, #2563EB, #3B82F6)",
+              color: "#FFFFFF",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontWeight: 800,
+              fontSize: "1.1rem",
+              flexShrink: 0,
+              boxShadow: "0 6px 18px rgba(37,99,235,.3)",
+              transition: "transform .4s cubic-bezier(.34,1.56,.64,1)",
+              transform: hovered ? "scale(1.08)" : "scale(1)",
+            }}
+          >
+            {initial}
+          </div>
+        )}
+        
         <div style={{ minWidth: 0 }}>
           <div
             style={{

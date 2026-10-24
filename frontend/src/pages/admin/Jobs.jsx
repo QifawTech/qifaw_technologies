@@ -252,37 +252,39 @@ export default function AdminJobs() {
                       </td>
                       <td>
                         <div className="d-flex gap-1 flex-wrap">
+                          
+                          {/* 1. Edit Button */}
                           <button className="btn btn-sm btn-dark-ghost"
                             style={{ padding: ".25rem .55rem", fontSize: ".75rem" }}
                             onClick={() => openEdit(j.id)}>
                             <i className="bi bi-pencil" /> Edit
                           </button>
-                          {j.status !== "published" && (
-                            <button className="btn btn-sm"
-                              style={{ padding: ".25rem .55rem", fontSize: ".75rem", background: "#DCFCE7", color: "#166534", border: 0 }}
-                              onClick={() => changeStatus(j.id, "published")} title="Publish">
-                              <i className="bi bi-eye" />
-                            </button>
-                          )}
-                          {j.status !== "closed" && (
-                            <button className="btn btn-sm"
-                              style={{ padding: ".25rem .55rem", fontSize: ".75rem", background: "#FEE2E2", color: "#991B1B", border: 0 }}
-                              onClick={() => changeStatus(j.id, "closed")} title="Close">
-                              <i className="bi bi-lock" />
-                            </button>
-                          )}
+
+                          {/* 2. Pause (Hold) Button: Published/Draft la irundha Hold ku pogum */}
                           {j.status !== "on_hold" && (
                             <button className="btn btn-sm"
                               style={{ padding: ".25rem .55rem", fontSize: ".75rem", background: "#FEF3C7", color: "#92400E", border: 0 }}
-                              onClick={() => changeStatus(j.id, "on_hold")} title="On Hold">
+                              onClick={() => changeStatus(j.id, "on_hold")} title="Put on Hold">
                               <i className="bi bi-pause" />
                             </button>
                           )}
+
+                          {/* 3. Unpause (Unhold) Button: On Hold la irundha Published ku varum */}
+                          {j.status === "on_hold" && (
+                            <button className="btn btn-sm"
+                              style={{ padding: ".25rem .55rem", fontSize: ".75rem", background: "#DCFCE7", color: "#166534", border: 0 }}
+                              onClick={() => changeStatus(j.id, "published")} title="Remove Hold">
+                              <i className="bi bi-play" />
+                            </button>
+                          )}
+
+                          {/* 4. Delete Button */}
                           <button className="btn btn-sm"
                             style={{ padding: ".25rem .55rem", fontSize: ".75rem", background: "#FEE2E2", color: "#991B1B", border: 0 }}
                             onClick={() => setConfirm({ open: true, id: j.id, title: j.title })} title="Delete">
                             <i className="bi bi-trash" />
                           </button>
+                          
                         </div>
                       </td>
                     </tr>

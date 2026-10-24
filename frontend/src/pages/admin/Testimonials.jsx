@@ -13,6 +13,7 @@ const EMPTY = {
   company: "",
   message: "",
   avatar_path: "",
+  rating: 5, // Default rating 5
   status: "draft",
 };
 
@@ -85,6 +86,7 @@ export default function AdminTestimonials() {
           company: t.company || "",
           message: t.message || "",
           avatar_path: t.avatar_path || "",
+          rating: t.rating || 5,
           status: t.status || "draft",
         },
       });
@@ -112,6 +114,7 @@ export default function AdminTestimonials() {
         company: f.company.trim(),
         message: f.message.trim(),
         avatar_path: f.avatar_path.trim(),
+        rating: Number(f.rating),
         status: f.status,
       };
       if (modal.mode === "create") {
@@ -221,6 +224,7 @@ export default function AdminTestimonials() {
                     <th>Client</th>
                     <th>Company</th>
                     <th>Message</th>
+                    <th>Rating</th>
                     <th>Status</th>
                     <th style={{ width: 220 }}>Actions</th>
                   </tr>
@@ -266,43 +270,50 @@ export default function AdminTestimonials() {
                         </div>
                       </td>
                       <td>
+                        <span className="badge bg-warning text-dark">
+                          {t.rating || 5} <i className="bi bi-star-fill" style={{fontSize: ".7rem"}}/>
+                        </span>
+                      </td>
+                      <td>
                         <span className={"badge-status " + badgeClass(t.status)}>
                           {t.status.replace("_", " ")}
                         </span>
                       </td>
                       <td>
                         <div className="d-flex gap-1 flex-wrap">
+                          
+                          {/* 1. Edit Button */}
                           <button className="btn btn-sm btn-dark-ghost"
                             style={{ padding: ".25rem .55rem", fontSize: ".75rem" }}
                             onClick={() => openEdit(t.id)}>
                             <i className="bi bi-pencil" /> Edit
                           </button>
-                          {t.status !== "published" && (
-                            <button className="btn btn-sm"
-                              style={{ padding: ".25rem .55rem", fontSize: ".75rem", background: "#DCFCE7", color: "#166534", border: 0 }}
-                              onClick={() => changeStatus(t.id, "published")} title="Publish">
-                              <i className="bi bi-eye" />
-                            </button>
-                          )}
-                          {t.status !== "draft" && (
-                            <button className="btn btn-sm"
-                              style={{ padding: ".25rem .55rem", fontSize: ".75rem", background: "#E5E7EB", color: "#374151", border: 0 }}
-                              onClick={() => changeStatus(t.id, "draft")} title="Draft">
-                              <i className="bi bi-eye-slash" />
-                            </button>
-                          )}
+
+                          {/* 2. Pause (Hold) Button */}
                           {t.status !== "on_hold" && (
                             <button className="btn btn-sm"
                               style={{ padding: ".25rem .55rem", fontSize: ".75rem", background: "#FEF3C7", color: "#92400E", border: 0 }}
-                              onClick={() => changeStatus(t.id, "on_hold")} title="On Hold">
+                              onClick={() => changeStatus(t.id, "on_hold")} title="Put on Hold">
                               <i className="bi bi-pause" />
                             </button>
                           )}
+
+                          {/* 3. Unpause (Unhold) Button */}
+                          {t.status === "on_hold" && (
+                            <button className="btn btn-sm"
+                              style={{ padding: ".25rem .55rem", fontSize: ".75rem", background: "#DCFCE7", color: "#166534", border: 0 }}
+                              onClick={() => changeStatus(t.id, "published")} title="Remove Hold">
+                              <i className="bi bi-play" />
+                            </button>
+                          )}
+
+                          {/* 4. Delete Button */}
                           <button className="btn btn-sm"
                             style={{ padding: ".25rem .55rem", fontSize: ".75rem", background: "#FEE2E2", color: "#991B1B", border: 0 }}
                             onClick={() => setConfirm({ open: true, id: t.id, name: t.client_name })} title="Delete">
                             <i className="bi bi-trash" />
                           </button>
+                          
                         </div>
                       </td>
                     </tr>
@@ -359,7 +370,20 @@ export default function AdminTestimonials() {
             <input className="form-control" placeholder="e.g. Finlytics" value={modal.form.company}
               onChange={(e) => setModal((m) => ({ ...m, form: { ...m.form, company: e.target.value } }))} />
           </div>
-          <div className="col-md-6">
+          
+          <div className="col-md-3">
+            <label className="form-label small fw-semibold">Star Rating</label>
+            <select className="form-select" value={modal.form.rating}
+              onChange={(e) => setModal((m) => ({ ...m, form: { ...m.form, rating: Number(e.target.value) } }))}>
+              <option value={5}>5 Stars</option>
+              <option value={4}>4 Stars</option>
+              <option value={3}>3 Stars</option>
+              <option value={2}>2 Stars</option>
+              <option value={1}>1 Star</option>
+            </select>
+          </div>
+
+          <div className="col-md-3">
             <label className="form-label small fw-semibold">Status</label>
             <select className="form-select" value={modal.form.status}
               onChange={(e) => setModal((m) => ({ ...m, form: { ...m.form, status: e.target.value } }))}>
