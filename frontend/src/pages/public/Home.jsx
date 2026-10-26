@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { publicApi } from "../../api/client.js";
 import ProductCard from "../../components/ProductCard.jsx";
@@ -8,6 +8,52 @@ import SectionHeading from "../../components/SectionHeading.jsx";
 import Reveal from "../../components/Reveal.jsx";
 import Robot from "../../components/Robot.jsx";
 import TestimonialCard from "../../components/TestimonialCard.jsx";
+
+// ⚡ Count-up Animation Hook
+function useCountUp(end, duration = 2000, start = 0) {
+  const [count, setCount] = useState(start);
+  const ref = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  // Screen la theriyutha nu check panna (Intersection Observer)
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, []);
+
+  // Count-up logic
+  useEffect(() => {
+    if (!isVisible) return;
+    let startTime = null;
+    const animate = (timestamp) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      setCount(Math.floor(progress * (end - start) + start));
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      }
+    };
+    requestAnimationFrame(animate);
+  }, [isVisible, end, duration, start]);
+
+  return { count, ref };
+}
+
+// ⚡ Chinna Component (Number-ah mattum kaatta)
+const CountUp = ({ end, suffix = "" }) => {
+  const { count, ref } = useCountUp(end);
+  return <span ref={ref}>{count}{suffix}</span>;
+};
+
 
 export default function Home() {
   const [state, setState] = useState({
@@ -117,9 +163,6 @@ export default function Home() {
     }
   };
 
-  // ❌ REMOVED: if (state.loading) return <Loader />; 
-  // Ithu thaan full page-ah block pannitu irundhathu. Ippo adhu illa.
-
   const hero = state.hero || {
     headline: "Build the future with modern IT solutions",
     subheadline:
@@ -142,7 +185,7 @@ export default function Home() {
   return (
     <>
       {/* ═══════════════════════════════════════════════════
-          HOME / HERO (With Skeleton Loading)
+          HOME / HERO
       ═══════════════════════════════════════════════════ */}
       <section id="home" className="hero-section">
         <div className="hero-bg-mesh" aria-hidden="true">
@@ -211,16 +254,18 @@ export default function Home() {
               <Reveal delay={400}>
                 <div className="hero-stats">
                   {[
-                    { num: "10+", label: "Projects Delivered", icon: "bi-rocket-takeoff" },
-                    { num: "30+", label: "Happy Clients", icon: "bi-emoji-smile" },
-                    { num: "99%", label: "Uptime SLA", icon: "bi-shield-check" },
+                    { num: 10, suffix: "+", label: "Projects Delivered", icon: "bi-rocket-takeoff" },
+                    { num: 30, suffix: "+", label: "Happy Clients", icon: "bi-emoji-smile" },
+                    { num: 99, suffix: "%", label: "Uptime SLA", icon: "bi-shield-check" },
                   ].map((s, i) => (
                     <div className="hero-stat" key={i}>
                       <div className="hero-stat-icon">
                         <i className={`bi ${s.icon}`} />
                       </div>
                       <div>
-                        <div className="hero-stat-num">{s.num}</div>
+                        <div className="hero-stat-num">
+                          <CountUp end={s.num} suffix={s.suffix} />
+                        </div>
                         <div className="hero-stat-label">{s.label}</div>
                       </div>
                     </div>
@@ -274,12 +319,12 @@ export default function Home() {
               <Reveal delay={240}>
                 <div className="about-stats-mini">
                   <div className="about-mini">
-                    <div className="about-mini-num">5+</div>
+                    <div className="about-mini-num"><CountUp end={3} suffix="+" /></div>
                     <div className="about-mini-label">Years Experience</div>
                   </div>
                   <div className="about-mini-divider" />
                   <div className="about-mini">
-                    <div className="about-mini-num">40+</div>
+                    <div className="about-mini-num"><CountUp end={10} suffix="+" /></div>
                     <div className="about-mini-label">Team Members</div>
                   </div>
                 </div>
@@ -647,7 +692,7 @@ export default function Home() {
       </section>
 
       {/* ═══════════════════════════════════════════════════
-          CONTACT (Ithu already fast-ah load aagum, so loading state thevai illa)
+          CONTACT
       ═══════════════════════════════════════════════════ */}
       <section
         id="contact"

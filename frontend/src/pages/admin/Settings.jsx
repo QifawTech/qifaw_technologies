@@ -219,13 +219,25 @@ export default function AdminSettings() {
           </div>
         </div>
 
-        {/* Right column — Logo */}
+        {/* ⚡ Right column — Logo (Mobile Alignment Fixed) */}
         <div className="col-lg-4">
-          <div className="card-clean p-4">
+          <div className="card-clean p-3 p-md-4">
             <h5 className="mb-3">Company Logo</h5>
             
-            {/* ⚡ FIX: Wrapped ImageUpload in a flex container for mobile alignment */}
-            <div style={{ width: "100%", overflow: "hidden" }}>
+            {/* ImageUpload-ah oru neat white box kulla vachirukken */}
+            <div 
+              style={{ 
+                background: "var(--bg-alt)", 
+                borderRadius: 12, 
+                padding: "1rem", 
+                display: "flex", 
+                flexDirection: "column", 
+                alignItems: "center",
+                justifyContent: "center",
+                width: "100%",
+                overflow: "hidden"
+              }}
+            >
               <ImageUpload
                 label=""
                 value={form.logo_path}
@@ -235,29 +247,34 @@ export default function AdminSettings() {
             
             <div
               className="small mt-3"
-              style={{ color: "var(--muted)", fontSize: ".78rem" }}
+              style={{ color: "var(--muted)", fontSize: ".75rem", textAlign: "center" }}
             >
               <i className="bi bi-info-circle me-1" />
-              Recommended: SVG or PNG, 200×50px, transparent background.
+              SVG or PNG, 200×50px (Transparent)
             </div>
           </div>
 
           {/* Preview Card */}
-          <div className="card-clean p-4 mt-4">
+          <div className="card-clean p-3 p-md-4 mt-4">
             <h6 className="mb-3">Preview</h6>
             <div
-              className="p-3"
               style={{
                 background: "var(--bg-alt)",
-                borderRadius: 10,
-                textAlign: "center",
+                borderRadius: 12,
+                padding: "2rem 1rem",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                minHeight: 100,
+                width: "100%",
+                overflow: "hidden"
               }}
             >
               {form.logo_path ? (
                 <img
                   src={`${api.defaults.baseURL}/public/media/${form.logo_path.replace(/^media\//, "")}`}
                   alt="Logo preview"
-                  style={{ maxWidth: "100%", maxHeight: 60 }}
+                  style={{ maxWidth: "100%", maxHeight: 60, objectFit: "contain" }}
                   onError={(e) => {
                     e.target.style.display = "none";
                   }}
@@ -267,11 +284,12 @@ export default function AdminSettings() {
                   style={{
                     background: "linear-gradient(135deg, #2563EB, #3B82F6)",
                     color: "#FFFFFF",
-                    padding: "6px 14px",
+                    padding: "8px 16px",
                     borderRadius: 8,
                     fontWeight: 800,
                     fontSize: ".9rem",
-                    display: "inline-block",
+                    textAlign: "center",
+                    wordBreak: "break-word"
                   }}
                 >
                   {form.company_name || "YOUR COMPANY"}
@@ -279,8 +297,8 @@ export default function AdminSettings() {
               )}
             </div>
             <div
-              className="small mt-3 text-center"
-              style={{ color: "var(--muted)" }}
+              className="small mt-3 text-center fw-semibold"
+              style={{ color: "var(--text)" }}
             >
               {form.company_name || "Company Name"}
             </div>

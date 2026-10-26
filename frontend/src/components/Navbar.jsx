@@ -3,14 +3,15 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useTheme } from "../hooks/useTheme.js";
 import { publicApi } from "../api/client.js";
 
-const API_BASE =
-  import.meta.env.VITE_API_BASE_URL || "/api/v1";
-
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [active, setActive] = useState("home");
+  
+  // ⚡ FIX: Settings API varra varaikkum loading state-ah use pandrom
   const [settings, setSettings] = useState({});
+  const [settingsLoading, setSettingsLoading] = useState(true); 
+  
   const { theme, toggleTheme } = useTheme();
 
   const navigate = useNavigate();
@@ -29,8 +30,13 @@ export default function Navbar() {
   useEffect(() => {
     publicApi
       .getSettings()
-      .then((r) => setSettings(r.data.data || {}))
-      .catch(() => {});
+      .then((r) => {
+        setSettings(r.data.data || {});
+        setSettingsLoading(false); // ⚡ Data vandhathum loading false
+      })
+      .catch(() => {
+        setSettingsLoading(false); // ⚡ Error vandhalum loading false
+      });
   }, []);
 
   // Detect scroll
@@ -80,12 +86,11 @@ export default function Navbar() {
     }
   };
 
-  // Compute logo URL
+  const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
   const logoUrl = settings.logo_path
-    ? `${API_BASE}/public/media/${settings.logo_path.replace(/^media\//, "")}`
+    ? `${apiBaseUrl}/${settings.logo_path.replace(/^\//, "")}`
     : null;
 
-  // Split company name into first + rest (for gradient styling)
   const fullName = settings.company_name || "Qifaw Technologies";
   const nameParts = fullName.trim().split(" ");
   const firstName = nameParts[0];
@@ -95,6 +100,7 @@ export default function Navbar() {
     <>
       <nav className={`nav-shell ${scrolled ? "nav-shell--scrolled" : ""}`}>
         <div className="container nav-inner">
+          
           {/* ═══ LOGO + COMPANY NAME ═══ */}
           <Link
             to="/"
@@ -106,7 +112,10 @@ export default function Navbar() {
               }
             }}
           >
-            {logoUrl ? (
+            {/* ⚡ FIX: Settings loading aagum varaikkum edhuvume kaattaadhu */}
+            {settingsLoading ? (
+              <div style={{ width: 40, height: 40 }}></div> // Blank space (Flicker thadukka)
+            ) : logoUrl ? (
               <img
                 src={logoUrl}
                 alt={fullName}
@@ -116,11 +125,12 @@ export default function Navbar() {
                 }}
               />
             ) : (
-              <span className="nav-brand-mark">
+              <span className="nav-brand-mark" style={{ background: "linear-gradient(135deg, #2563EB, #3B82F6)" }}>
                 <span className="nav-brand-dot" />
                 {fullName[0].toUpperCase()}
               </span>
             )}
+            
             <span className="nav-brand-text">
               {firstName}
               {restName && (
