@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom"; // ⚡ NEW: useLocation import pannirukken
 import api from "../../api/client.js";
 
 export default function ChangePassword() {
   const navigate = useNavigate();
+  const location = useLocation(); // ⚡ NEW: Location track pandrom
   const [toast, setToast] = useState(null);
   const [currentEmail, setCurrentEmail] = useState("");
 
@@ -44,6 +45,14 @@ export default function ChangePassword() {
       })
       .catch(() => {});
   }, []);
+
+  // ⚡ NEW: Page change aagumbothu ellathayum reset pannum (Unsaved changes poidum)
+  useEffect(() => {
+    setEmailForm({ current_password: "", new_email: "" });
+    setEmailErrors({});
+    setForm({ current_password: "", new_password: "", confirm_password: "" });
+    setErrors({});
+  }, [location.pathname]);
 
   // ── EMAIL HANDLERS ────────────────────────────────────
   const updateEmail = (key, value) => {

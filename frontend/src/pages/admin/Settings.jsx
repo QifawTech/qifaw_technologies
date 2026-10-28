@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom"; // ⚡ NEW: Import pannirukken
 import api from "../../api/client.js";
 import Loader from "../../components/Loader.jsx";
 import ErrorAlert from "../../components/ErrorAlert.jsx";
@@ -18,6 +19,8 @@ const EMPTY = {
 };
 
 export default function AdminSettings() {
+  const location = useLocation(); // ⚡ NEW: Location track pandrom
+
   const [state, setState] = useState({
     loading: true,
     error: null,
@@ -52,6 +55,11 @@ export default function AdminSettings() {
   useEffect(() => {
     load();
   }, []);
+
+  // ⚡ NEW: Page change aagumbothu form-ah reset pannum (Unsaved changes poidum)
+  useEffect(() => {
+    setForm(original);
+  }, [location.pathname, original]);
 
   const update = (key, value) => setForm((f) => ({ ...f, [key]: value }));
 

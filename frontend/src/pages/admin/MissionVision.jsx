@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom"; // ⚡ NEW: Import pannirukken
 import api from "../../api/client.js";
 import Loader from "../../components/Loader.jsx";
 import ErrorAlert from "../../components/ErrorAlert.jsx";
 import Reveal from "../../components/Reveal.jsx";
 
 export default function MissionVision() {
+  const location = useLocation(); // ⚡ NEW: Location track pandrom
+
   const [state, setState] = useState({ loading: true, error: null });
   const [forms, setForms] = useState({
     mission: { title: "", body: "" },
@@ -54,6 +57,11 @@ export default function MissionVision() {
       cancelled = true;
     };
   }, []);
+
+  // ⚡ NEW: Page change aagumbothu form-ah reset pannum (Unsaved changes poidum)
+  useEffect(() => {
+    setForms(original);
+  }, [location.pathname, original]);
 
   const updateField = (section, key, value) => {
     setForms((f) => ({

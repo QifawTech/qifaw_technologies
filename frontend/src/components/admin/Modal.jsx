@@ -1,6 +1,14 @@
 import { useEffect } from "react";
 
-export default function Modal({ open, title, onClose, children, footer, size = "md" }) {
+export default function Modal({ 
+  open, 
+  title, 
+  onClose, 
+  children, 
+  footer, 
+  size = "md",
+  closeOnClickOutside = true // ⚡ Ithu thaan puthu prop
+}) {
   useEffect(() => {
     if (!open) return;
     const onKey = (e) => e.key === "Escape" && onClose?.();
@@ -29,7 +37,8 @@ export default function Modal({ open, title, onClose, children, footer, size = "
         overflowY: "auto",
         animation: "fadeIn .2s ease",
       }}
-      onClick={onClose}
+      // ⚡ Ithu thaan mukkiyam: closeOnClickOutside true-ah irundha mattum onClose call aagum
+      onClick={closeOnClickOutside ? onClose : undefined}
     >
       <div
         className="card-clean"

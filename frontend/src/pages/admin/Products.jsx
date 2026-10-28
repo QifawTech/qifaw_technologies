@@ -281,7 +281,7 @@ export default function AdminProducts() {
                             <i className="bi bi-pencil" /> Edit
                           </button>
                           
-                          {/* 2. Pause (Hold) Button: Published/Draft la irundha Hold ku pogum */}
+                          {/* 2. Pause (Hold) Button */}
                           {p.status !== "on_hold" && (
                             <button className="btn btn-sm"
                               style={{ padding: ".25rem .55rem", fontSize: ".75rem", background: "#FEF3C7", color: "#92400E", border: 0 }}
@@ -290,7 +290,7 @@ export default function AdminProducts() {
                             </button>
                           )}
 
-                          {/* 3. Unpause (Unhold) Button: On Hold la irundha Published ku varum */}
+                          {/* 3. Unpause (Unhold) Button */}
                           {p.status === "on_hold" && (
                             <button className="btn btn-sm"
                               style={{ padding: ".25rem .55rem", fontSize: ".75rem", background: "#DCFCE7", color: "#166534", border: 0 }}
@@ -328,9 +328,12 @@ export default function AdminProducts() {
         </>
       )}
 
-      <Modal open={modal.open}
+      {/* ⚡ MUKKIYAM: Inga `closeOnClickOutside={false}` add pannirukken */}
+      <Modal 
+        open={modal.open}
         title={modal.mode === "create" ? "Add Product" : "Edit Product"}
         onClose={() => setModal({ open: false, mode: "create", form: EMPTY })}
+        closeOnClickOutside={false}
         size="lg"
         footer={
           <>

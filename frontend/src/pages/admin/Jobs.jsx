@@ -308,9 +308,12 @@ export default function AdminJobs() {
         </>
       )}
 
-      <Modal open={modal.open}
+      {/* ⚡ MUKKIYAM: Inga `closeOnClickOutside={false}` add pannirukken */}
+      <Modal 
+        open={modal.open}
         title={modal.mode === "create" ? "Add Job" : "Edit Job"}
         onClose={() => setModal({ open: false, mode: "create", form: EMPTY })}
+        closeOnClickOutside={false}
         size="lg"
         footer={
           <>
