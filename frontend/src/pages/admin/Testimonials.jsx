@@ -110,11 +110,11 @@ export default function AdminTestimonials() {
     try {
       const payload = {
         client_name: f.client_name.trim(),
-        client_role: f.client_role.trim(),
-        company: f.company.trim(),
+        client_role: (f.client_role || "").trim(),
+        company: (f.company || "").trim(),
         message: f.message.trim(),
-        avatar_path: f.avatar_path.trim(),
-        rating: Number(f.rating),
+        avatar_path: (f.avatar_path || "").trim(),
+        rating: Number(f.rating) || 5,
         status: f.status,
       };
       if (modal.mode === "create") {
