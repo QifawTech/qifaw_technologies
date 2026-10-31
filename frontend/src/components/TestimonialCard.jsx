@@ -1,13 +1,12 @@
 import { useState } from "react";
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "/api/v1";
+
 // Image URL Helper
 const getImageUrl = (imagePath) => {
   if (!imagePath) return null;
   if (imagePath.startsWith("http")) return imagePath;
-  
-  // Backend-oda direct media URL
-  const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
-  return `${baseUrl}/${imagePath.replace(/^\//, "")}`;
+  return `${API_BASE}/public/media/${imagePath.replace(/^media\//, "")}`;
 };
 
 export default function TestimonialCard({ testimonial }) {
