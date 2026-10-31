@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import api from "../../api/client.js";
 import Loader from "../../components/Loader.jsx";
 import ErrorAlert from "../../components/ErrorAlert.jsx";
@@ -113,13 +113,13 @@ export default function AdminProducts() {
     try {
       const payload = {
         name: f.name.trim(),
-        slug: f.slug.trim() || undefined,
-        short_description: f.short_description.trim(),
-        description: f.description.trim(),
-        category: f.category.trim(),
-        demo_url: f.demo_url.trim(),
-        image_path: f.image_path.trim(),
-        features: f.features.split("\n").map((x) => x.trim()).filter(Boolean),
+        slug: (f.slug || "").trim() || undefined,
+        short_description: (f.short_description || "").trim(),
+        description: (f.description || "").trim(),
+        category: (f.category || "").trim(),
+        demo_url: (f.demo_url || "").trim(),
+        image_path: (f.image_path || "").trim(),
+        features: (f.features || "").split("\n").map((x) => x.trim()).filter(Boolean),
         status: f.status,
       };
       if (modal.mode === "create") {
