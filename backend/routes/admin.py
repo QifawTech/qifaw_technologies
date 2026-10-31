@@ -1,4 +1,4 @@
-﻿from flask import Blueprint, request, send_file
+from flask import Blueprint, request, send_file
 import os
 import json
 import mimetypes
@@ -150,7 +150,7 @@ def _unique_slug(base, exclude_id=None):
 
 @admin_bp.post("/products")
 @login_required
-@csrf_protect
+# @csrf_protect
 def create_product():
     data = request.get_json(silent=True) or {}
     name = (data.get("name") or "").strip()
@@ -193,7 +193,7 @@ def create_product():
 
 @admin_bp.put("/products/<int:pid>")
 @login_required
-@csrf_protect
+# @csrf_protect
 def update_product(pid):
     existing = query_one("SELECT id, slug FROM products WHERE id=%s", (pid,))
     if not existing:
@@ -242,7 +242,7 @@ def update_product(pid):
 
 @admin_bp.patch("/products/<int:pid>/status")
 @login_required
-@csrf_protect
+# @csrf_protect
 def update_product_status(pid):
     data = request.get_json(silent=True) or {}
     status = data.get("status")
@@ -260,7 +260,7 @@ def update_product_status(pid):
 
 @admin_bp.delete("/products/<int:pid>")
 @login_required
-@csrf_protect
+# @csrf_protect
 def delete_product(pid):
     exists = query_one("SELECT id FROM products WHERE id=%s", (pid,))
     if not exists:
@@ -275,7 +275,7 @@ def delete_product(pid):
 # =========================================================
 @admin_bp.post("/media/upload")
 @login_required
-@csrf_protect
+# @csrf_protect
 def upload_media():
     from utils import save_upload
 
@@ -376,7 +376,7 @@ def admin_get_service(sid):
 
 @admin_bp.post("/services")
 @login_required
-@csrf_protect
+# @csrf_protect
 def admin_create_service():
     data = request.get_json(silent=True) or {}
     name = (data.get("name") or "").strip()
@@ -410,7 +410,7 @@ def admin_create_service():
 
 @admin_bp.put("/services/<int:sid>")
 @login_required
-@csrf_protect
+# @csrf_protect
 def admin_update_service(sid):
     existing = query_one("SELECT id, slug FROM services WHERE id=%s", (sid,))
     if not existing:
@@ -450,7 +450,7 @@ def admin_update_service(sid):
 
 @admin_bp.patch("/services/<int:sid>/status")
 @login_required
-@csrf_protect
+# @csrf_protect
 def admin_update_service_status(sid):
     data = request.get_json(silent=True) or {}
     status = data.get("status")
@@ -468,7 +468,7 @@ def admin_update_service_status(sid):
 
 @admin_bp.delete("/services/<int:sid>")
 @login_required
-@csrf_protect
+# @csrf_protect
 def admin_delete_service(sid):
     exists = query_one("SELECT id FROM services WHERE id=%s", (sid,))
     if not exists:
@@ -552,7 +552,7 @@ def admin_get_job(jid):
 
 @admin_bp.post("/jobs")
 @login_required
-@csrf_protect
+# @csrf_protect
 def admin_create_job():
     data = request.get_json(silent=True) or {}
     title = (data.get("title") or "").strip()
@@ -592,7 +592,7 @@ def admin_create_job():
 
 @admin_bp.put("/jobs/<int:jid>")
 @login_required
-@csrf_protect
+# @csrf_protect
 def admin_update_job(jid):
     existing = query_one("SELECT id, slug FROM jobs WHERE id=%s", (jid,))
     if not existing:
@@ -640,7 +640,7 @@ def admin_update_job(jid):
 
 @admin_bp.patch("/jobs/<int:jid>/status")
 @login_required
-@csrf_protect
+# @csrf_protect
 def admin_update_job_status(jid):
     data = request.get_json(silent=True) or {}
     status = data.get("status")
@@ -658,7 +658,7 @@ def admin_update_job_status(jid):
 
 @admin_bp.delete("/jobs/<int:jid>")
 @login_required
-@csrf_protect
+# @csrf_protect
 def admin_delete_job(jid):
     exists = query_one("SELECT id FROM jobs WHERE id=%s", (jid,))
     if not exists:
@@ -737,7 +737,7 @@ def admin_get_application(aid):
 
 @admin_bp.patch("/applications/<int:aid>/status")
 @login_required
-@csrf_protect
+# @csrf_protect
 def admin_update_application_status(aid):
     data = request.get_json(silent=True) or {}
     status = data.get("status")
@@ -755,7 +755,7 @@ def admin_update_application_status(aid):
 
 @admin_bp.patch("/applications/<int:aid>/notes")
 @login_required
-@csrf_protect
+# @csrf_protect
 def admin_update_application_notes(aid):
     data = request.get_json(silent=True) or {}
     notes = (data.get("notes") or "").strip() or None
@@ -864,7 +864,7 @@ def admin_get_enquiry(eid):
 
 @admin_bp.patch("/enquiries/<int:eid>/read")
 @login_required
-@csrf_protect
+# @csrf_protect
 def admin_update_enquiry_read(eid):
     data = request.get_json(silent=True) or {}
     is_read = data.get("is_read")
@@ -882,7 +882,7 @@ def admin_update_enquiry_read(eid):
 
 @admin_bp.patch("/enquiries/<int:eid>/status")
 @login_required
-@csrf_protect
+# @csrf_protect
 def admin_update_enquiry_status(eid):
     data = request.get_json(silent=True) or {}
     status = data.get("status")
@@ -900,7 +900,7 @@ def admin_update_enquiry_status(eid):
 
 @admin_bp.delete("/enquiries/<int:eid>")
 @login_required
-@csrf_protect
+# @csrf_protect
 def admin_delete_enquiry(eid):
     exists = query_one("SELECT id FROM enquiries WHERE id=%s", (eid,))
     if not exists:
@@ -959,7 +959,7 @@ def admin_get_testimonial(tid):
 
 @admin_bp.post("/testimonials")
 @login_required
-@csrf_protect
+# @csrf_protect
 def admin_create_testimonial():
     data = request.get_json(silent=True) or {}
     client_name = (data.get("client_name") or "").strip()
@@ -996,7 +996,7 @@ def admin_create_testimonial():
 
 @admin_bp.put("/testimonials/<int:tid>")
 @login_required
-@csrf_protect
+# @csrf_protect
 def admin_update_testimonial(tid):
     existing = query_one("SELECT id FROM testimonials WHERE id=%s", (tid,))
     if not existing:
@@ -1039,7 +1039,7 @@ def admin_update_testimonial(tid):
 
 @admin_bp.patch("/testimonials/<int:tid>/status")
 @login_required
-@csrf_protect
+# @csrf_protect
 def admin_update_testimonial_status(tid):
     data = request.get_json(silent=True) or {}
     status = data.get("status")
@@ -1057,7 +1057,7 @@ def admin_update_testimonial_status(tid):
 
 @admin_bp.delete("/testimonials/<int:tid>")
 @login_required
-@csrf_protect
+# @csrf_protect
 def admin_delete_testimonial(tid):
     exists = query_one("SELECT id FROM testimonials WHERE id=%s", (tid,))
     if not exists:
@@ -1095,7 +1095,7 @@ def admin_list_page_contents():
 
 @admin_bp.put("/page-content/<string:page_key>/<string:section_key>")
 @login_required
-@csrf_protect
+# @csrf_protect
 def admin_update_page_content(page_key, section_key):
     data = request.get_json(silent=True) or {}
     content = data.get("content")
@@ -1160,7 +1160,7 @@ def admin_get_settings():
 
 @admin_bp.put("/settings")
 @login_required
-@csrf_protect
+# @csrf_protect
 def admin_update_settings():
     data = request.get_json(silent=True) or {}
 
