@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import api from "../../api/client.js";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "/api/v1";
@@ -7,12 +7,20 @@ export default function ImageUpload({ value, onChange, label = "Image" }) {
   const inputRef = useRef(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(null);
+  const [localPreview, setLocalPreview] = useState(null);
 
-  const previewUrl = value
+  // Clear local preview if value changes from outside or gets removed
+  useEffect(() => {
+    if (!value) {
+      setLocalPreview(null);
+    }
+  }, [value]);
+
+  const previewUrl = localPreview || (value
     ? value.startsWith("http")
       ? value
       : `${API_BASE}/public/media/${value.replace(/^media\//, "")}`
-    : null;
+    : null);
 
   const handleFile = async (file) => {
     if (!file) return;
@@ -28,17 +36,34 @@ export default function ImageUpload({ value, onChange, label = "Image" }) {
       return;
     }
 
+    // Instant local preview
+    try {
+      const objUrl = URL.createObjectURL(file);
+      setLocalPreview(objUrl);
+    } catch {
+      // ignore
+    }
+
     setUploading(true);
     try {
       const fd = new FormData();
       fd.append("file", file);
-      const r = await api.post("/admin/media/upload", fd, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      const path = r.data?.data?.path;
-      if (path) onChange(path);
+      // Let Axios automatically compute multipart boundary
+      const r = await api.post("/admin/media/upload", fd);
+      if (typeof r.data === "string" && r.data.includes("<!DOCTYPE")) {
+        setError("Upload request was intercepted. Please refresh the page and try again.");
+        return;
+      }
+      const path = r.data?.data?.path || r.data?.path;
+      if (path) {
+        onChange(path);
+        setError(null);
+      } else {
+        setError(r.data?.message || "Upload failed to return file path");
+      }
     } catch (e) {
-      setError(e.response?.data?.message || e.message);
+      setLocalPreview(null);
+      setError(e.response?.data?.message || e.message || "Failed to upload image");
     } finally {
       setUploading(false);
       if (inputRef.current) inputRef.current.value = "";
@@ -52,8 +77,10 @@ export default function ImageUpload({ value, onChange, label = "Image" }) {
   };
 
   const handleClear = () => {
+    setLocalPreview(null);
     onChange("");
     setError(null);
+    if (inputRef.current) inputRef.current.value = "";
   };
 
   return (
@@ -73,27 +100,47 @@ export default function ImageUpload({ value, onChange, label = "Image" }) {
       >
         {previewUrl ? (
           <div className="d-flex align-items-center gap-3">
-            <img
-              src={previewUrl}
-              alt="Preview"
-              style={{
-                width: 80,
-                height: 80,
-                objectFit: "cover",
-                borderRadius: 10,
-                border: "1px solid var(--border)",
-                flexShrink: 0,
-              }}
-              onError={(e) => {
-                e.target.style.display = "none";
-              }}
-            />
+            <div style={{ position: "relative", width: 80, height: 80 }}>
+              <img
+                src={previewUrl}
+                alt="Preview"
+                style={{
+                  width: 80,
+                  height: 80,
+                  objectFit: "cover",
+                  borderRadius: 10,
+                  border: "1px solid var(--border)",
+                  flexShrink: 0,
+                  opacity: uploading ? 0.5 : 1,
+                }}
+                onError={(e) => {
+                  if (localPreview) {
+                    e.target.style.display = "none";
+                  }
+                }}
+              />
+              {uploading && (
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    background: "rgba(0,0,0,0.3)",
+                    borderRadius: 10,
+                  }}
+                >
+                  <span className="spinner-border spinner-border-sm text-light" />
+                </div>
+              )}
+            </div>
             <div className="flex-grow-1" style={{ minWidth: 0 }}>
               <div
                 className="small fw-semibold"
                 style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
               >
-                {value}
+                {uploading ? "Uploading new image..." : (value || "New image selected")}
               </div>
               <div className="d-flex gap-2 mt-2">
                 <button
@@ -108,6 +155,7 @@ export default function ImageUpload({ value, onChange, label = "Image" }) {
                   type="button"
                   className="btn btn-sm btn-dark-ghost"
                   onClick={handleClear}
+                  disabled={uploading}
                 >
                   <i className="bi bi-x-lg me-1" /> Remove
                 </button>
