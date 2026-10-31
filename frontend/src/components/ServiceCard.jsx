@@ -1,4 +1,4 @@
-﻿import { Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 // Icon mapping
 const getIcon = (service) => {
@@ -12,11 +12,12 @@ const getIcon = (service) => {
   return "bi-grid-1x2";
 };
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "/api/v1";
+
 const getImageUrl = (imagePath) => {
   if (!imagePath) return null;
   if (imagePath.startsWith("http")) return imagePath;
-  const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:5000"; 
-  return `${baseUrl}/${imagePath.replace(/^\//, "")}`;
+  return `${API_BASE}/public/media/${imagePath.replace(/^media\//, "")}`;
 };
 
 export default function ServiceCard({ service, index = 0 }) {
