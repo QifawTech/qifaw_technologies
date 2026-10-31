@@ -108,12 +108,12 @@ export default function AdminServices() {
     try {
       const payload = {
         name: f.name.trim(),
-        slug: f.slug.trim() || undefined,
-        short_description: f.short_description.trim(),
-        description: f.description.trim(),
-        image_path: f.image_path.trim(),
-        cta_text: f.cta_text.trim(),
-        cta_link: f.cta_link.trim(),
+        slug: (f.slug || "").trim() || undefined,
+        short_description: (f.short_description || "").trim(),
+        description: (f.description || "").trim(),
+        image_path: (f.image_path || "").trim(),
+        cta_text: (f.cta_text || "").trim(),
+        cta_link: (f.cta_link || "").trim(),
         status: f.status,
       };
       if (modal.mode === "create") {
