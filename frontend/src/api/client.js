@@ -39,10 +39,7 @@ export const publicApi = {
   getService: (slug) => api.get(`/public/services/${slug}`),
   getJobs: (params) => api.get("/public/jobs", { params }),
   getJob: (slug) => api.get(`/public/jobs/${slug}`),
-  applyJob: (id, formData) =>
-    api.post(`/public/jobs/${id}/apply`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    }),
+  applyJob: (id, formData) => api.post(`/public/jobs/${id}/apply`, formData), // Manual header removed here
   createEnquiry: (data) => api.post("/public/enquiries", data),
   getTestimonials: () => api.get("/public/testimonials"),
 };
