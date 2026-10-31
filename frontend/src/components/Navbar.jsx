@@ -8,14 +8,21 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [active, setActive] = useState("home");
   
-  // ⚡ FIX: LocalStorage la irundhu initial state-ah edukkom
+  // ⚡ FIX: Immediate logo & settings with LocalStorage cache + reliable defaults
   const [settings, setSettings] = useState(() => {
     try {
       const cached = localStorage.getItem("qifaw_nav_settings");
-      return cached ? JSON.parse(cached) : {};
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed && typeof parsed === "object") return parsed;
+      }
     } catch {
-      return {};
+      // fallback
     }
+    return {
+      company_name: "Qifaw Technologies",
+      logo_path: "media/b6947d1ebe4749b5890a098866b32eb7.png",
+    };
   });
 
   const { theme, toggleTheme } = useTheme();
@@ -37,8 +44,7 @@ export default function Navbar() {
       .getSettings()
       .then((r) => {
         const data = r.data.data || {};
-        setSettings(data);
-        // ⚡ FIX: API data-va LocalStorage la save pandrom
+        setSettings((prev) => ({ ...prev, ...data }));
         localStorage.setItem("qifaw_nav_settings", JSON.stringify(data));
       })
       .catch(() => {});
@@ -91,11 +97,14 @@ export default function Navbar() {
     }
   };
 
-  // Logo URL path
-  const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  // Logo URL path - defaults to /favicon.png immediately so no flash/empty image
+  const API_BASE = import.meta.env.VITE_API_BASE_URL || "/api/v1";
+  const defaultLogo = "/favicon.png";
   const logoUrl = settings.logo_path
-    ? `${apiBaseUrl}/${settings.logo_path.replace(/^\//, "")}`
-    : null;
+    ? settings.logo_path.startsWith("http")
+      ? settings.logo_path
+      : `${API_BASE}/public/media/${settings.logo_path.replace(/^media\//, "")}`
+    : defaultLogo;
 
   const fullName = settings.company_name || "Qifaw Technologies";
   const nameParts = fullName.trim().split(" ");
@@ -119,34 +128,17 @@ export default function Navbar() {
             }}
             style={{ textDecoration: "none" }}
           >
-            {logoUrl ? (
-              <img
-                src={logoUrl}
-                alt={fullName}
-                className="nav-brand-logo"
-                onError={(e) => {
-                  e.target.style.display = "none";
-                }}
-                style={{ maxHeight: "40px", objectFit: "contain" }}
-              />
-            ) : (
-              <span
-                className="nav-brand-mark"
-                style={{
-                  background: "linear-gradient(135deg, #2563EB, #3B82F6)",
-                  color: "#FFF",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  borderRadius: "10px",
-                  width: "40px",
-                  height: "40px",
-                  fontWeight: 800,
-                }}
-              >
-                {fullName[0].toUpperCase()}
-              </span>
-            )}
+            <img
+              src={logoUrl}
+              alt={fullName}
+              className="nav-brand-logo"
+              onError={(e) => {
+                if (e.target.src !== window.location.origin + defaultLogo) {
+                  e.target.src = defaultLogo;
+                }
+              }}
+              style={{ maxHeight: "40px", width: "auto", objectFit: "contain" }}
+            />
             
             <span className="nav-brand-text" style={{ fontSize: "1.2rem", fontWeight: 700, color: "var(--text)" }}>
               {firstName}
@@ -218,11 +210,47 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* ═══ MOBILE MENU ═══ */}
-      <div className={`mobile-menu ${open ? "is-open" : ""}`} style={{ padding: "2rem", background: "var(--surface)", borderBottom: "1px solid var(--border)" }}>
-        <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "1rem" }}>
+      {/* ═══ MOBILE BACKDROP (Starts UNDER navbar, never blurs top header) ═══ */}
+      <div
+        className={`mobile-backdrop ${open ? "is-open" : ""}`}
+        onClick={() => setOpen(false)}
+        style={{
+          position: "fixed",
+          top: scrolled ? "64px" : "72px",
+          right: 0,
+          bottom: 0,
+          left: 0,
+          zIndex: 1040,
+          background: "rgba(15, 23, 42, 0.55)",
+          backdropFilter: "blur(4px)",
+          WebkitBackdropFilter: "blur(4px)",
+          opacity: open ? 1 : 0,
+          pointerEvents: open ? "auto" : "none",
+          transition: "opacity 0.3s ease",
+        }}
+      />
+
+      {/* ═══ MOBILE MENU (Flush directly below navbar) ═══ */}
+      <div
+        className={`mobile-menu ${open ? "is-open" : ""}`}
+        style={{
+          position: "fixed",
+          top: scrolled ? "64px" : "72px",
+          right: 0,
+          width: "min(340px, 86vw)",
+          height: scrolled ? "calc(100dvh - 64px)" : "calc(100dvh - 72px)",
+          zIndex: 1050,
+          padding: "1.25rem 1.25rem 2rem",
+          background: "var(--surface)",
+          boxShadow: "-10px 10px 40px rgba(0, 0, 0, 0.2)",
+          borderLeft: "1px solid var(--border)",
+          borderTop: "1px solid var(--border)",
+          overflowY: "auto",
+        }}
+      >
+        <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "0.5rem" }}>
           {links.map((l, i) => (
-            <li key={l.id} style={{ transitionDelay: open ? `${i * 40}ms` : "0ms" }}>
+            <li key={l.id} style={{ transitionDelay: open ? `${i * 35}ms` : "0ms" }}>
               <button
                 className={`mobile-link ${active === l.id && location.pathname === "/" ? "is-active" : ""}`}
                 onClick={() => scrollTo(l.id)}
@@ -231,10 +259,11 @@ export default function Navbar() {
                   textAlign: "left",
                   background: "transparent",
                   border: "none",
-                  fontSize: "1.1rem",
+                  fontSize: "1.05rem",
                   fontWeight: 600,
                   color: active === l.id ? "var(--accent)" : "var(--text)",
-                  padding: "0.75rem 0",
+                  padding: "0.85rem 1rem",
+                  borderRadius: "10px",
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
@@ -242,13 +271,13 @@ export default function Navbar() {
                 }}
               >
                 <span>{l.label}</span>
-                <i className="bi bi-arrow-up-right" style={{ fontSize: "0.9rem", color: "var(--muted)" }} />
+                <i className="bi bi-arrow-up-right" style={{ fontSize: "0.85rem", opacity: 0.6 }} />
               </button>
             </li>
           ))}
-          <li style={{ transitionDelay: open ? `${links.length * 40}ms` : "0ms" }}>
+          <li style={{ transitionDelay: open ? `${links.length * 35}ms` : "0ms", marginTop: "0.75rem" }}>
             <button
-              className="btn btn-lime w-100 mt-2"
+              className="btn btn-lime w-100"
               onClick={() => scrollTo("contact")}
               style={{ padding: "0.85rem", borderRadius: "12px", fontWeight: 600 }}
             >
@@ -257,13 +286,6 @@ export default function Navbar() {
           </li>
         </ul>
       </div>
-
-      {/* Mobile backdrop */}
-      <div
-        className={`mobile-backdrop ${open ? "is-open" : ""}`}
-        onClick={() => setOpen(false)}
-        style={{ background: "rgba(0,0,0,0.5)", position: "fixed", inset: 0, zIndex: 999, opacity: open ? 1 : 0, pointerEvents: open ? "auto" : "none", transition: "opacity 0.3s ease" }}
-      />
     </>
   );
 }
